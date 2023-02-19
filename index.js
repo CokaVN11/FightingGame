@@ -60,9 +60,17 @@ const player = new Fighter({
       framesMax: 2,
     },
     attack1: {
-        imageSrc: "./img/samuraiMack/Attack1.png",
-        framesMax: 6,
+      imageSrc: "./img/samuraiMack/Attack1.png",
+      framesMax: 6,
     },
+  },
+  attackBox: {
+    offset: {
+      x: 100,
+      y: 50,
+    },
+    width: 160,
+    height: 50,
   },
 });
 
@@ -101,9 +109,17 @@ const enemy = new Fighter({
       framesMax: 2,
     },
     attack1: {
-        imageSrc: "./img/kenji/Attack1.png",
-        framesMax: 4,
+      imageSrc: "./img/kenji/Attack1.png",
+      framesMax: 4,
     },
+  },
+  attackBox: {
+    offset: {
+      x: -175,
+      y: 50,
+    },
+    width: 175,
+    height: 50,
   },
 });
 
@@ -144,13 +160,12 @@ function animate() {
   // enenmy movement
   if (keys.ArrowLeft.pressed && enemy.lastKey === "ArrowLeft") {
     enemy.velocity.x = -5;
-    enemy.switchSprite('run');
+    enemy.switchSprite("run");
   } else if (keys.ArrowRight.pressed && enemy.lastKey === "ArrowRight") {
     enemy.velocity.x = 5;
-    enemy.switchSprite('run');
-  }
-  else {
-    enemy.switchSprite('idle');
+    enemy.switchSprite("run");
+  } else {
+    enemy.switchSprite("idle");
   }
 
   // enemy jumping
@@ -160,17 +175,34 @@ function animate() {
     enemy.switchSprite("fall");
   }
 
-
-  if (rectCollision(player, enemy) && player.isAttacking) {
+  if (
+    rectCollision(player, enemy) &&
+    player.isAttacking &&
+    player.frames.current === 4
+  ) {
     player.isAttacking = false;
     enemy.health -= 20;
     document.getElementById("enemyHealth").style.width = enemy.health + "%";
   }
 
-  if (rectCollision(enemy, player) && enemy.isAttacking) {
+  // if player misses
+  if (player.isAttacking && player.frames.current === 4) {
+    player.isAttacking = false;
+  }
+
+  if (
+    rectCollision(enemy, player) &&
+    enemy.isAttacking &&
+    enemy.frames.current === 2
+  ) {
     enemy.isAttacking = false;
     player.health -= 20;
     document.getElementById("playerHealth").style.width = player.health + "%";
+  }
+
+  // if enemy misses
+  if (enemy.isAttacking && enemy.frames.current === 2) {
+    enemy.isAttacking = false;
   }
 
   if (player.health <= 0 || enemy.health <= 0) {
